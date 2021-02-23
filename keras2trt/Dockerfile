@@ -10,6 +10,8 @@ RUN pip3 install tensorflow-addons==0.11.2
 
 RUN pip3 install keras2onnx
 
+RUN pip3 install matplotlib jupyter tqdm xmltodict
+
 WORKDIR /workspace
 
 CMD ["/bin/bash"]
