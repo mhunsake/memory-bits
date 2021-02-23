@@ -1,1 +1,2 @@
-inception-imagenet-model.trt
+*.trt
+*.h5

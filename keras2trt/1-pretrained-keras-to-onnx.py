@@ -7,8 +7,7 @@ import keras2onnx
 
 def main():
 
-    onnx_file_path =   'inception-imagenet-model.onnx'
-    engine_file_path = 'inception-imagenet-model.trt'
+    onnx_file_path =   'imagenet-inceptionv3-model.onnx'
 
     if not os.path.exists(onnx_file_path):
         # convert pre-trained tensorflow model to onnx

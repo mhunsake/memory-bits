@@ -12,8 +12,7 @@ import tensorflow as tf
 import keras2onnx
 
 import sys, os
-sys.path.insert(1,'/opt/tensorrt/samples/python')
-import common
+import trtsamplescommon as trtcommon
 
 class PreprocessINCEPTION(object):
     def __init__(self, yolo_input_resolution):
@@ -48,7 +47,7 @@ def get_engine(onnx_file_path, engine_file_path=""):
     """Attempts to load a serialized engine if available, otherwise builds a new TensorRT engine and saves it."""
     def build_engine():
         """Takes an ONNX file and creates a TensorRT engine to run inference with"""
-        with trt.Builder(TRT_LOGGER) as builder, builder.create_network(common.EXPLICIT_BATCH) as network, trt.OnnxParser(network, TRT_LOGGER) as parser:
+        with trt.Builder(TRT_LOGGER) as builder, builder.create_network(trtcommon.EXPLICIT_BATCH) as network, trt.OnnxParser(network, TRT_LOGGER) as parser:
             builder.max_workspace_size = 1 << 28 # 256MiB
             builder.max_batch_size = 1
             # Parse model file
@@ -83,8 +82,8 @@ def get_engine(onnx_file_path, engine_file_path=""):
 
 def main():
 
-    onnx_file_path =   'inception-imagenet-model.onnx'
-    engine_file_path = 'inception-imagenet-model.trt'
+    onnx_file_path =   'imagenet-inceptionv3-model.onnx'
+    engine_file_path = 'imagenet-inceptionv3-model.trt'
 
     if not os.path.exists(onnx_file_path):
         print ("missing .onnx file")
@@ -93,17 +92,17 @@ def main():
     engine = get_engine(onnx_file_path, engine_file_path)
     context = engine.create_execution_context()
 
-    with open('imagenet_labels.txt') as fp:
+    with open('imagenet-labels.txt') as fp:
         LABELS = [line.strip() for line in fp]
 
     for input_image_path in ('dog1.jpg','dog2.jpg','cat1.jpg','cat2.jpg'):
         preprocessor = PreprocessINCEPTION((299,299))
         image_raw, image = preprocessor.process(input_image_path)
 
-        inputs, outputs, bindings, stream = common.allocate_buffers(engine)
+        inputs, outputs, bindings, stream = trtcommon.allocate_buffers(engine)
         print('Running inference on image {}...'.format(input_image_path))
         inputs[0].host = image
-        trt_outputs = common.do_inference_v2(context, bindings=bindings, inputs=inputs, outputs=outputs, stream=stream)
+        trt_outputs = trtcommon.do_inference_v2(context, bindings=bindings, inputs=inputs, outputs=outputs, stream=stream)
         x = np.argsort(trt_outputs[0])
         t1,t2,t3 = x[-1],x[-2],x[-3]
         print(input_image_path,t1,trt_outputs[0][t1],LABELS[t1])

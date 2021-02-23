@@ -8,7 +8,9 @@ RUN wget https://github.com/alexshvid/tensorflow/releases/download/v2.3.1-cuda10
 RUN pip3 install tensorflow-2.3.1-cp36-cp36m-linux_x86_64.whl
 RUN pip3 install tensorflow-addons==0.11.2
 
-RUN pip3 install keras2onnx
+# need to install from source to work with tensorflow 2.3.1
+RUN pip3 install git+https://github.com/microsoft/onnxconverter-common
+RUN pip3 install git+https://github.com/onnx/keras-onnx
 
 RUN pip3 install matplotlib jupyter tqdm xmltodict
 
